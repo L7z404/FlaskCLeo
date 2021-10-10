@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Variables</title>
+</head>
+<body>
+    <h3>El nombre es: {{ nombre }}</h3>
+    <h3>Su edad es: {{ edad }}</h3>
+
+    {% if edad<18 %}
+        <p> es menor de edad </p>
+    {% endif %}
+
+    {% for item in lista %}
+        <p>{{ item }}</p>
+    {% endfor %}
+</body>
+</html>

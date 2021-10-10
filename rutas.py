@@ -17,6 +17,3 @@ def params():
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
 
-
-#Vas en el video 5 del curso Leo...
-#Nada
