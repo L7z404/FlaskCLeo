@@ -18,8 +18,20 @@
 </head>
 
 <body>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    
     {% block content %}
-
     {% endblock %}
 
     <footer class="m-5">
