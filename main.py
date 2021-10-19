@@ -4,21 +4,30 @@ from flask import request
 from flask import make_response
 from flask import session
 from flask import flash
+from flask import g
 from flask.helpers import url_for
 from flask import redirect
 from flask_wtf import CSRFProtect
-from werkzeug.utils import redirect
+from config import DevelopmentConfig
 
 import forms
 import json
 
 app = Flask(__name__)
-app.secret_key = 'secret'
-csrf = CSRFProtect(app)
+app.config.from_object(DevelopmentConfig)
+csrf = CSRFProtect()
 
 @app.errorhandler(404)
 def page_not_found(e): 
     return render_template('404.html'), 404
+
+@app.before_request
+def before_request(): 
+    pass
+
+@app.after_request
+def after_request(response): 
+    return response
 
 @app.route('/')
 def index(): 
@@ -59,7 +68,7 @@ def comment():
         print("Error en el formulario")
     
     title = 'Curso Flask'
-    return render_template('index.html', title = title, form = comment_form)
+    return render_template('comment.html', title = title, form = comment_form)
 
 @app.route('/cookie')
 def cookie(): 
@@ -75,4 +84,5 @@ def ajax_login():
     return json.dumps(response)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    csrf.init_app(app)
+    app.run(port=8000)
