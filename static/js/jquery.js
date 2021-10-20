@@ -1,4 +1,4 @@
-$(document).ready(function () {
+/* $(document).ready(function () {
     console.log("Mensaje en la consola que indica que todo esta bien.")
     
     function ajax_login() {
@@ -19,4 +19,4 @@ $(document).ready(function () {
         event.preventDefault();
         ajax_login();
     })
-});
+}); */

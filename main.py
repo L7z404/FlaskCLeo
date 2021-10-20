@@ -27,7 +27,10 @@ def page_not_found(e):
 
 @app.before_request
 def before_request(): 
-    pass
+    if 'username' not in session and request.endpoint in ['comment']: 
+        return redirect(url_for('login'))
+    elif 'username' in session and request.endpoint in ['login', 'create']: 
+        return redirect(url_for('index'))
 
 @app.after_request
 def after_request(response): 
@@ -54,8 +57,19 @@ def login():
     login_form = forms.LoginForm(request.form)
     if request.method == 'POST' and login_form.validate(): 
         username = login_form.username.data
-        success_message = 'Bienvenido {}'.format(username)
-        flash(success_message)
+        password = login_form.password.data
+        
+        user = User.query.filter_by(username=username).first()
+        
+        if user is not None and user.verify_password(password): 
+            success_message = 'Bienvenido {}'.format(username)
+            flash(success_message)
+            session['username'] = username
+            return redirect(url_for('index'))
+        else: 
+            error_message = 'Usuario o contraseña no válidos'
+            flash(error_message)
+        
         session['username'] = login_form.username.data
         
     title = 'Login'
