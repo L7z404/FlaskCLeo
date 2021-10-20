@@ -8,7 +8,11 @@ from flask import g
 from flask.helpers import url_for
 from flask import redirect
 from flask_wtf import CSRFProtect
+from wtforms import form
 from config import DevelopmentConfig
+
+from models import db 
+from models import User
 
 import forms
 import json
@@ -70,6 +74,19 @@ def comment():
     title = 'Curso Flask'
     return render_template('comment.html', title = title, form = comment_form)
 
+@app.route('/create', methods = ['GET', 'POST'])
+def create(): 
+    create_form = forms.CreateForm(request.form)
+    if request.method == 'POST' and create_form.validate(): 
+        user = User(create_form.username.data,
+                    create_form.password.data,
+                    create_form.email.data)
+        db.session.add(user)
+        db.session.commit()
+        success_message = 'Usuario registrado en la base de datos'
+        flash(success_message)
+    return render_template('create.html', form=create_form)
+
 @app.route('/cookie')
 def cookie(): 
     response = make_response(render_template('cookie.html'))
@@ -85,4 +102,8 @@ def ajax_login():
 
 if __name__ == '__main__':
     csrf.init_app(app)
+    db.init_app(app)
+    
+    with app.app_context():
+        db.create_all()
     app.run(port=8000)

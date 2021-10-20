@@ -28,3 +28,17 @@ class LoginForm(Form):
     password = PasswordField('Contraseña', [
         validators.Required(message='La contraseña es requerida')
     ])
+
+class CreateForm(Form): 
+    username = TextField('Nombre de Usuario', [
+        validators.Required(message= 'El nombre de usuario es requerido'),
+        validators.length(min=4, max=50, message='Ingrese un nombre de usuario válido')
+    ])
+    email = EmailField('Correo Electronico', [
+        validators.Required(message='El email es requerido'),
+        validators.Email(message='Ingrese un email válido'),
+        validators.length(min=4, max=50, message="Ingrese un email válido")
+    ])
+    password = PasswordField('Contraseña', [
+        validators.Required(message='La contraseña es requerida')
+    ])

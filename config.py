@@ -1,4 +1,5 @@
 import os
+import pymysql
 
 from flask_sqlalchemy import SQLAlchemy
 class Config(object): 
@@ -6,6 +7,6 @@ class Config(object):
 
 class DevelopmentConfig(Config): 
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:@localhost/flask'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost/flask'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    #Vas en el minuto 7:55 del video 24
