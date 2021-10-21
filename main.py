@@ -11,7 +11,7 @@ from flask_wtf import CSRFProtect
 from wtforms import form
 from config import DevelopmentConfig
 
-from models import db 
+from models import Comment, db 
 from models import User
 
 import forms
@@ -65,6 +65,7 @@ def login():
             success_message = 'Bienvenido {}'.format(username)
             flash(success_message)
             session['username'] = username
+            session['user_id'] = user.id
             return redirect(url_for('index'))
         else: 
             error_message = 'Usuario o contraseña no válidos'
@@ -72,18 +73,22 @@ def login():
         
         session['username'] = login_form.username.data
         
+        
+        
     title = 'Login'
     return render_template('login.html', title=title, form = login_form)
 
 @app.route('/comment', methods = ['GET', 'POST'])
 def comment():
+    print(session['user_id'])
     comment_form = forms.CommentForm(request.form)
     if request.method == 'POST' and comment_form.validate(): 
-        print(comment_form.username.data)
-        print(comment_form.email.data)
-        print(comment_form.comment.data)
-    else: 
-        print("Error en el formulario")
+        user_id = session['user_id']
+        comment = Comment(user_id = user_id, text = comment_form.comment.data)
+        db.session.add(comment)
+        db.session.commit()
+        success_message = 'Nuevo comentario creado'
+        flash(success_message)
     
     title = 'Curso Flask'
     return render_template('comment.html', title = title, form = comment_form)
