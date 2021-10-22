@@ -1,3 +1,4 @@
+import email
 from flask import Flask
 from flask import render_template
 from flask import request
@@ -5,15 +6,20 @@ from flask import make_response
 from flask import session
 from flask import flash
 from flask import g
+from flask.ctx import copy_current_request_context
 from flask.helpers import url_for
 from flask import redirect
 from flask_wtf import CSRFProtect
-from wtforms import form
 from config import DevelopmentConfig
 
 from models import Comment, db 
 from models import User
 from helper import date_format
+
+from flask_mail import Mail
+from flask_mail import Message
+
+import threading
 
 import forms
 import json
@@ -21,6 +27,15 @@ import json
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 csrf = CSRFProtect()
+mail = Mail()
+
+def send_email(user_email, username): 
+    msg = Message('Gracias por tu registro', 
+                    sender=app.config['MAIL_USERNAME'],
+                    recipients=[user_email])
+        
+    msg.html=render_template('email.html',username=username)
+    mail.send(msg)
 
 @app.errorhandler(404)
 def page_not_found(e): 
@@ -111,8 +126,18 @@ def create():
                     create_form.email.data)
         db.session.add(user)
         db.session.commit()
+        
+        @copy_current_request_context
+        def send_message(email, username): 
+            send_email(email, username)
+            
+        
+        sender = threading.Thread(name='mail_sender', target=send_message, args=(user.email,user.username))
+        sender.start()
+        
         success_message = 'Usuario registrado en la base de datos'
         flash(success_message)
+        
     return render_template('create.html', form=create_form)
 
 @app.route('/cookie')
@@ -131,6 +156,7 @@ def ajax_login():
 if __name__ == '__main__':
     csrf.init_app(app)
     db.init_app(app)
+    mail.init_app(app)
     
     with app.app_context():
         db.create_all()
