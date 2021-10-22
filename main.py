@@ -13,6 +13,7 @@ from config import DevelopmentConfig
 
 from models import Comment, db 
 from models import User
+from helper import date_format
 
 import forms
 import json
@@ -80,7 +81,7 @@ def login():
 
 @app.route('/comment', methods = ['GET', 'POST'])
 def comment():
-    print(session['user_id'])
+    #print(session['user_id'])
     comment_form = forms.CommentForm(request.form)
     if request.method == 'POST' and comment_form.validate(): 
         user_id = session['user_id']
@@ -92,6 +93,14 @@ def comment():
     
     title = 'Curso Flask'
     return render_template('comment.html', title = title, form = comment_form)
+
+@app.route('/reviews/<int:page>', methods = ['GET'])
+def reviews(page=1): 
+    per_page = 3
+    comments = Comment.query.join(User).add_columns(User.username,
+                                                    Comment.created_date,
+                                                    Comment.text).paginate(page,per_page,False)
+    return render_template('reviews.html', comments = comments, date_format = date_format)
 
 @app.route('/create', methods = ['GET', 'POST'])
 def create(): 
